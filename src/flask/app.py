@@ -249,6 +249,7 @@ class Flask(App):
     session_interface: SessionInterface = SecureCookieSessionInterface()
 
     def __init_subclass__(cls, **kwargs: t.Any) -> None:
+        super().__init_subclass__(**kwargs)
         import warnings
 
         # These method signatures were updated to take a ctx param. Detect
