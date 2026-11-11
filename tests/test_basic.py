@@ -1972,3 +1972,23 @@ def test_app_freed_on_zero_refcount():
         assert weak() is None
     finally:
         gc.enable()
+
+
+def test_flask_init_subclass_calls_cooperative_mixin_hook():
+    seen = []
+
+    class RegistryMixin:
+        def __init_subclass__(cls, *, tag=None, **kwargs):
+            super().__init_subclass__(**kwargs)
+            seen.append((cls.__name__, tag))
+
+    class AppWithMixin(flask.Flask, RegistryMixin, tag="registered"):
+        pass
+
+    assert seen == [("AppWithMixin", "registered")]
+
+
+def test_flask_init_subclass_rejects_unknown_class_keyword():
+    with pytest.raises(TypeError):
+        class AppWithUnknownKeyword(flask.Flask, unexpected=True):
+            pass
